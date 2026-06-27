@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('company_profiles', function (Blueprint $table) {
-            Schema::create('company_profiles', function (Blueprint $table) {
+
                 $table->id();
                 $table->foreignId('user_id')->constrained()->cascadeOnDelete();
                 $table->string('company_name');
@@ -22,7 +22,7 @@ return new class extends Migration
                 $table->boolean('verified')->default(false);
                 $table->timestamps();
             });
-        });
+      
     }
 
     /**
