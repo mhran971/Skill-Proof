@@ -16,13 +16,14 @@ return new class extends Migration
                 $table->id();
                 $table->foreignId('user_id')->constrained()->cascadeOnDelete();
                 $table->string('company_name');
+                $table->text('description')->nullable();
                 $table->string('logo')->nullable();
                 $table->string('industry')->nullable();
                 $table->string('size')->nullable();        // "50-200"
                 $table->boolean('verified')->default(false);
                 $table->timestamps();
             });
-      
+
     }
 
     /**

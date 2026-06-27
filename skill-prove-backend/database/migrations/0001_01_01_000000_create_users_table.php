@@ -23,6 +23,7 @@ return new class extends Migration
             $table->tinyInteger('profile_completion')->default(0);
             $table->integer('reputation')->default(0);
             $table->tinyInteger('readiness')->default(0);
+            $table->boolean('is_suspended')->default(false);
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamps();
         });
