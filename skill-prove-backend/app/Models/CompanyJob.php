@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CompanyJob extends Model
 {
+    protected $table = 'company_jobs';
     protected $fillable = [
         'company_id', 'title',
         'description',      // ← جديد
@@ -42,4 +43,9 @@ class CompanyJob extends Model
         }
         return null;
     }
+
+    public function applications()
+{
+    return $this->hasMany(CandidateJobApplication::class, 'job_id');
+}
 }

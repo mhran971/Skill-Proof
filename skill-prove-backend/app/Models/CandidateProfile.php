@@ -7,15 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 class CandidateProfile extends Model
 {
     protected $table = 'candidate_profiles';
-    protected $fillable = [
-        'user_id',
-        'title',
-        'location',
-        'bio',
-        'reputation',
-        'readiness',
-        'profile_completion',
-
-    ];
-    
+    protected $fillable = ['bio', 'skills', 'github_url', 'linkedin_url', 'portfolio_url', 'avatar_url'];
 }

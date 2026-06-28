@@ -6,8 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Education extends Model
 {
+    protected $table = 'educations';
     protected $fillable = [
-        'user_id', 'school', 'degree', 'years', 'gpa', 'sort_order',
+        'user_id',
+        'school',
+        'degree',
+        'years',
+        'gpa',
+        'sort_order',
     ];
 
     public function user()
