@@ -1,17 +1,39 @@
 <?php
+
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Model;
 
 class Challenge extends Model
 {
     protected $fillable = [
-        'title','description','difficulty','skills_required',
-        'deadline','xp_reward','instructions','company_id','status',
-    ];
-    protected $casts = [
-        'skills_required'=>'array','deadline'=>'date','xp_reward'=>'integer',
+        'company_id',
+        'title_ar', 'title_en',
+        'description_ar', 'description_en',
+        'category', 'difficulty', 'duration',
+        'reward',
+        'skills_required',  // ← جديد (json)
+        'status',
     ];
 
-    public function company()     { return $this->belongsTo(User::class, 'company_id'); }
-    public function submissions() { return $this->hasMany(Submission::class); }
+    protected $casts = [
+        'skills_required' => 'array',  // ← جديد
+        'reward'          => 'integer',
+    ];
+
+    public function company()
+    {
+        return $this->belongsTo(User::class, 'company_id');
+    }
+
+    public function submissions()
+    {
+        return $this->hasMany(Submission::class);
+    }
+
+    // ← جديد
+    public function rubrics()
+    {
+        return $this->hasMany(ChallengeRubric::class)->orderBy('sort_order');
+    }
 }
