@@ -5,10 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useI18n } from "@/lib/i18n";
-import { useEffect, useState } from "react";
-import { api } from "@/lib/api/client";
 import { microTasks, earningsByMonth, earningsTransactions } from "@/lib/mock-data";
-import { Coins, Clock, Star, Wallet, ArrowDownToLine, TrendingUp, Loader2 } from "lucide-react";
+import { Coins, Clock, Star, Wallet, ArrowDownToLine, TrendingUp } from "lucide-react";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -23,23 +21,7 @@ export const Route = createFileRoute("/app/tasks")({
 
 function Tasks() {
   const { t, lang } = useI18n();
-  const [tasks, setTasks] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const data = await api.get<any[]>("/tasks");
-        setTasks(data);
-      } catch (error) {
-        console.error("Failed to fetch tasks", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTasks();
-  }, []);
-
+  const all = [...microTasks, ...microTasks];
   const total = earningsByMonth.reduce((a, b) => a + b.v, 0);
   const thisMonth = earningsByMonth[earningsByMonth.length - 1].v;
 
@@ -73,31 +55,20 @@ function Tasks() {
 
           <Card><CardContent className="p-0">
             <div className="divide-y">
-              {loading ? (
-                <div className="flex justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                </div>
-              ) : (
-                tasks.map((tt, i) => (
-                  <div key={i} className="flex flex-wrap items-center gap-4 p-4">
-                    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent text-accent-foreground"><Coins className="h-5 w-5" /></div>
-                    <div className="min-w-0 flex-1">
-                      <div className="font-semibold">{tt.title}</div>
-                      <div className="mt-1 flex flex-wrap gap-3 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{tt.duration_minutes} min</span>
-                        <span className="flex items-center gap-1"><Star className="h-3 w-3 text-warning" />{tt.difficulty}</span>
-                      </div>
+              {all.map((tt, i) => (
+                <div key={i} className="flex flex-wrap items-center gap-4 p-4">
+                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent text-accent-foreground"><Coins className="h-5 w-5" /></div>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold">{tt.title[lang]}</div>
+                    <div className="mt-1 flex flex-wrap gap-3 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{tt.time}</span>
+                      <span className="flex items-center gap-1"><Star className="h-3 w-3 text-warning" />{tt.rating}</span>
                     </div>
-                    <div className="text-end"><div className="text-lg font-extrabold text-gradient">{tt.reward_amount} SAR</div></div>
-                    <Button size="sm" className="bg-gradient-primary text-primary-foreground">{t("start")}</Button>
                   </div>
-                ))
-              )}
-              {!loading && tasks.length === 0 && (
-                <div className="py-12 text-center text-muted-foreground italic">
-                  {lang === "ar" ? "لا توجد مهام متاحة حالياً" : "No tasks available currently"}
+                  <div className="text-end"><div className="text-lg font-extrabold text-gradient">{tt.payout} SAR</div></div>
+                  <Button size="sm" className="bg-gradient-primary text-primary-foreground">{t("start")}</Button>
                 </div>
-              )}
+              ))}
             </div>
           </CardContent></Card>
         </TabsContent>

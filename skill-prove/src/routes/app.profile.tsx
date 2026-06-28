@@ -7,10 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { useI18n } from "@/lib/i18n";
-import { rubricSkills, myRubricScores } from "@/lib/mock-data";
-import { Mail, MapPin, Award, GraduationCap, FolderGit2, Video, Trophy, Pencil, Eye, CheckCircle2, Star, ClipboardList, Clock, XCircle, Bot, Github, Globe, Play, FileText, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { api } from "@/lib/api/client";
+import { candidate, skills, rubricSkills, myRubricScores, submissions } from "@/lib/mock-data";
+import { Mail, MapPin, Award, GraduationCap, FolderGit2, Video, Trophy, Pencil, Eye, CheckCircle2, Star, ClipboardList, Clock, XCircle, Bot, Github, Globe, Play, FileText } from "lucide-react";
 
 export const Route = createFileRoute("/app/profile")({
   head: () => ({ meta: [{ title: "Profile — SkillProof" }] }),
@@ -35,36 +33,6 @@ const badges = ["Top 5%", "AI Pioneer", "Challenge Champion", "Streak 30d", "Ver
 
 function Profile() {
   const { t, lang } = useI18n();
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const profileData = await api.get<any>("/candidate/profile");
-        setData(profileData);
-      } catch (error) {
-        console.error("Failed to fetch profile", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
-  if (loading) {
-    return (
-      <AppShell>
-        <div className="flex h-[50vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      </AppShell>
-    );
-  }
-
-  const profile = data?.candidate_profile || {};
-  const user = data || {};
-
   return (
     <AppShell>
       <Card className="overflow-hidden">
@@ -72,15 +40,15 @@ function Profile() {
         <CardContent className="relative p-6">
           <div className="flex flex-wrap items-end gap-5">
             <Avatar className="-mt-16 h-24 w-24 shrink-0 border-4 border-card shadow-elegant">
-              <AvatarImage src={user.avatar} />
-              <AvatarFallback>{user.name?.[0]}</AvatarFallback>
+              <AvatarImage src={candidate.avatar} />
+              <AvatarFallback>L</AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1">
-              <h1 className="text-2xl font-extrabold">{user.name}</h1>
-              <p className="text-sm text-muted-foreground">{user.title}</p>
+              <h1 className="text-2xl font-extrabold">{candidate.name[lang]}</h1>
+              <p className="text-sm text-muted-foreground">{candidate.title[lang]}</p>
               <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1"><Mail className="h-3.5 w-3.5" /> {user.email}</span>
-                <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {user.location}</span>
+                <span className="flex items-center gap-1"><Mail className="h-3.5 w-3.5" /> {candidate.email}</span>
+                <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {candidate.location[lang]}</span>
               </div>
             </div>
             <Button variant="outline" size="sm" className="gap-2"><Pencil className="h-4 w-4" />{lang==="ar"?"تعديل":"Edit"}</Button>
@@ -88,9 +56,9 @@ function Profile() {
 
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
             {[
-              {l:t("readiness"),v:`${user.readiness || 0}%`},
-              {l:t("reputation"),v:(user.reputation || 0).toLocaleString()},
-              {l:t("profileCompletion"),v:`${user.profile_completion || 0}%`},
+              {l:t("readiness"),v:`${candidate.readiness}%`},
+              {l:t("reputation"),v:candidate.reputation.toLocaleString()},
+              {l:t("profileCompletion"),v:`${candidate.profileCompletion}%`},
             ].map((s,i)=>(
               <div key={i} className="rounded-xl bg-gradient-soft p-4">
                 <div className="text-xs text-muted-foreground">{s.l}</div>
@@ -115,57 +83,53 @@ function Profile() {
 
         <TabsContent value="skills" className="mt-4">
           <Card><CardContent className="grid gap-4 p-6 sm:grid-cols-2">
-            {(user.user_skills || []).map((s: any)=>(
-              <div key={s.id} className="rounded-xl border p-4">
+            {skills.map(s=>(
+              <div key={s.name} className="rounded-xl border p-4">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold">{s.skill.name}</span>
+                  <span className="font-semibold">{s.name}</span>
                   <Badge variant="secondary">{s.level}</Badge>
                 </div>
-                <Progress value={s.score || 0} className="mt-3 h-2" />
+                <Progress value={s.score} className="mt-3 h-2" />
               </div>
             ))}
-            {(!user.user_skills?.length) && <div className="col-span-full text-center text-muted-foreground py-4 italic">{lang==="ar"?"لا توجد مهارات مضافة":"No skills added"}</div>}
           </CardContent></Card>
         </TabsContent>
 
         <TabsContent value="education" className="mt-4">
           <Card><CardContent className="space-y-3 p-6">
-            {(user.educations || []).map((e: any,i: number)=>(
+            {education.map((e,i)=>(
               <div key={i} className="flex items-start gap-4 rounded-xl border p-4">
                 <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-gradient-primary text-primary-foreground"><GraduationCap className="h-5 w-5"/></div>
                 <div className="min-w-0 flex-1">
-                  <div className="font-semibold">{e.institution}</div>
+                  <div className="font-semibold">{e.school}</div>
                   <div className="text-sm text-muted-foreground">{e.degree}</div>
-                  <div className="mt-1 text-xs text-muted-foreground">{e.start_date} — {e.end_date || t("present")}</div>
+                  <div className="mt-1 text-xs text-muted-foreground">{e.years} · {e.gpa}</div>
                 </div>
               </div>
             ))}
-            {(!user.educations?.length) && <div className="text-center text-muted-foreground py-4 italic">{lang==="ar"?"لا توجد معلومات تعليمية":"No education info"}</div>}
           </CardContent></Card>
         </TabsContent>
 
         <TabsContent value="certs" className="mt-4">
           <Card><CardContent className="grid gap-3 p-6 sm:grid-cols-2">
-            {(user.certifications || []).map((c: any,i: number)=>(
+            {certs.map((c,i)=>(
               <div key={i} className="flex items-start gap-3 rounded-xl border p-4">
                 <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-accent text-accent-foreground"><Award className="h-5 w-5"/></div>
-                <div><div className="font-semibold">{c.name}</div><div className="text-xs text-muted-foreground">{c.issuing_organization} · {c.year}</div></div>
+                <div><div className="font-semibold">{c.name}</div><div className="text-xs text-muted-foreground">{c.issuer} · {c.year}</div></div>
               </div>
             ))}
-            {(!user.certifications?.length) && <div className="col-span-full text-center text-muted-foreground py-4 italic">{lang==="ar"?"لا توجد شهادات":"No certifications"}</div>}
           </CardContent></Card>
         </TabsContent>
 
         <TabsContent value="portfolio" className="mt-4">
           <Card><CardContent className="grid gap-3 p-6 sm:grid-cols-2 lg:grid-cols-3">
-            {(user.portfolio_items || []).map((p: any,i: number)=>(
+            {portfolio.map((p,i)=>(
               <a key={i} href={p.url} className="group rounded-xl border p-5 transition hover:shadow-elegant">
                 <FolderGit2 className="h-6 w-6 text-primary"/>
-                <div className="mt-3 font-semibold group-hover:text-primary">{p.title}</div>
-                <div className="text-xs text-muted-foreground">{p.description}</div>
+                <div className="mt-3 font-semibold group-hover:text-primary">{p.name}</div>
+                <div className="text-xs text-muted-foreground">{p.stack}</div>
               </a>
             ))}
-            {(!user.portfolio_items?.length) && <div className="col-span-full text-center text-muted-foreground py-4 italic">{lang==="ar"?"لا توجد أعمال في المعرض":"No portfolio items"}</div>}
           </CardContent></Card>
         </TabsContent>
 

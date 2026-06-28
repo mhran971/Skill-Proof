@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import {
   LayoutDashboard,
   User,
@@ -24,6 +24,7 @@ import { useI18n, dict } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { candidate } from "@/lib/mock-data";
 
 type Item = { to: string; icon: any; key: keyof typeof dict };
 
@@ -49,20 +50,7 @@ const adminItems: Item[] = [{ to: "/app/admin", icon: Shield, key: "admin" }];
 export function AppShell({ children }: { children: ReactNode }) {
   const { t, lang, setLang, dir } = useI18n();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("user");
-  };
 
   const NavLink = ({ item }: { item: Item }) => {
     const active = pathname === item.to || (item.to !== "/app/dashboard" && pathname.startsWith(item.to));
@@ -125,14 +113,14 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="rounded-xl border bg-gradient-soft p-3">
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9">
-            <AvatarImage src={user?.avatar} />
-            <AvatarFallback>{user?.name?.[0] || 'U'}</AvatarFallback>
+            <AvatarImage src={candidate.avatar} />
+            <AvatarFallback>L</AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <div className="truncate text-sm font-semibold">{user?.name}</div>
-            <div className="truncate text-xs text-muted-foreground">{user?.title}</div>
+            <div className="truncate text-sm font-semibold">{candidate.name[lang]}</div>
+            <div className="truncate text-xs text-muted-foreground">{candidate.title[lang]}</div>
           </div>
-          <Link to="/login" onClick={handleLogout} className="text-muted-foreground hover:text-foreground">
+          <Link to="/login" className="text-muted-foreground hover:text-foreground">
             <LogOut className="h-4 w-4" />
           </Link>
         </div>
@@ -197,8 +185,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               <span className="absolute end-1.5 top-1.5 h-2 w-2 rounded-full bg-primary-glow" />
             </Button>
             <Avatar className="h-8 w-8">
-              <AvatarImage src={user?.avatar} />
-              <AvatarFallback>{user?.name?.[0] || 'U'}</AvatarFallback>
+              <AvatarImage src={candidate.avatar} />
+              <AvatarFallback>L</AvatarFallback>
             </Avatar>
           </div>
         </header>
