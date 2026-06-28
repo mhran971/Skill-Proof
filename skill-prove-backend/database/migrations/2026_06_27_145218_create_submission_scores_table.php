@@ -12,10 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('submission_scores', function (Blueprint $table) {
-            $table->id();
+           $table->id();
             $table->foreignId('submission_id')->constrained()->cascadeOnDelete();
-            $table->string('skill_key'); // "code","arch","testing","docs","delivery","present","comm","problem","team"
-            $table->decimal('score', 4, 1); // 0.0 - 10.0
+            $table->integer('score')->default(0);
+            $table->text('feedback')->nullable();
+            $table->foreignId('scored_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

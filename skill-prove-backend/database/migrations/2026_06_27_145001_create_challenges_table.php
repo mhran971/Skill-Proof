@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('title_en');
             $table->text('description_ar')->nullable();
             $table->text('description_en')->nullable();
+            $table->json('skills_required')->default('[]')->after('reward');
             $table->string('category');               // "Frontend", "Backend", "Data"
             $table->enum('difficulty', ['Beginner', 'Intermediate', 'Advanced'])->default('Intermediate');
             $table->string('duration');               // "2h", "3h", "90m"

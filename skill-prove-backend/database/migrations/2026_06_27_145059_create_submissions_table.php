@@ -21,6 +21,10 @@ return new class extends Migration
                 ->default('pending_ai');
             $table->text('feedback_ar')->nullable();
             $table->text('feedback_en')->nullable();
+            $table->decimal('ai_score', 4, 1)->nullable()->after('reviewer_id');
+            $table->text('ai_feedback_ar')->nullable()->after('ai_score');
+            $table->text('ai_feedback_en')->nullable()->after('ai_feedback_ar');
+            $table->timestamp('ai_evaluated_at')->nullable()->after('ai_feedback_en');
             $table->boolean('accepted_to_showcase')->default(false);
             $table->timestamp('submitted_at')->nullable();
             $table->timestamps();

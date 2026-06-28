@@ -14,12 +14,14 @@ return new class extends Migration
         Schema::create('candidate_profiles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->string('title')->nullable();       // "Full-Stack Developer"
-            $table->string('location')->nullable();
             $table->text('bio')->nullable();
-            $table->integer('reputation')->default(0);
-            $table->integer('readiness')->default(0);  // 0-100
-            $table->integer('profile_completion')->default(0); // 0-100
+            $table->json('skills')->default('[]');
+            $table->integer('xp_points')->default(0);
+            $table->integer('level')->default(1);
+            $table->string('github_url')->nullable();
+            $table->string('linkedin_url')->nullable();
+            $table->string('portfolio_url')->nullable();
+            $table->string('avatar_url')->nullable();
             $table->timestamps();
         });
     }

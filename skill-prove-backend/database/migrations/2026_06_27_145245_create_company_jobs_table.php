@@ -18,6 +18,11 @@ return new class extends Migration
             $table->string('location');
             $table->unsignedInteger('salary_min')->nullable();
             $table->unsignedInteger('salary_max')->nullable();
+            $table->text('description')->nullable()->after('title');
+            $table->enum('type', ['full-time', 'part-time', 'remote', 'hybrid'])
+                ->default('full-time')->after('description');
+            $table->json('skills_required')->default('[]')->after('salary_max');
+            $table->date('deadline')->nullable()->after('skills_required');
             $table->enum('status', ['open', 'reviewing', 'closed'])->default('open');
             $table->unsignedInteger('applicants_count')->default(0);
             $table->timestamps();

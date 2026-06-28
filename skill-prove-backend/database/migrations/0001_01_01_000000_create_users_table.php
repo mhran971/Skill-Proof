@@ -16,6 +16,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
+            $table->enum('badge_tier', ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond'])
+                ->default('Bronze')
+                ->after('readiness');
             $table->enum('role', ['candidate', 'company', 'admin'])->default('candidate');
             $table->string('avatar')->nullable();
             $table->string('location')->nullable();

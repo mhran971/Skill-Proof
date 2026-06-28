@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('submission_links', function (Blueprint $table) {
-           $table->id();
-            $table->foreignId('submission_id')->constrained()->cascadeOnDelete();
-            $table->string('url');
-            $table->enum('type', ['github','demo','video','document','other'])->default('other');
+        Schema::create('candidate_job_applications', function (Blueprint $table) {
+            $table->id();
             $table->timestamps();
         });
     }
@@ -25,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('submission_links');
+        Schema::dropIfExists('candidate_job_applications');
     }
 };
