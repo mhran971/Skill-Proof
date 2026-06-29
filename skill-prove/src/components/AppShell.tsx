@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import {
   LayoutDashboard,
@@ -21,10 +21,12 @@ import {
   Search,
 } from "lucide-react";
 import { useI18n, dict } from "@/lib/i18n";
+import { useAuth } from "@/lib/auth";
+import { logoutApi } from "@/lib/api/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { candidate } from "@/lib/mock-data";
+import { toast } from "sonner";
 
 type Item = { to: string; icon: any; key: keyof typeof dict };
 
@@ -49,8 +51,31 @@ const adminItems: Item[] = [{ to: "/app/admin", icon: Shield, key: "admin" }];
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { t, lang, setLang, dir } = useI18n();
+  const { user, clearAuth } = useAuth();
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  const handleLogout = async () => {
+    try {
+      await logoutApi();
+    } catch {
+      // Token may already be invalid — proceed with client-side logout
+    }
+    clearAuth();
+    navigate({ to: "/login" });
+    toast.success(lang === "ar" ? "تم تسجيل الخروج" : "Signed out");
+  };
+
+  const displayName = user?.name ?? "";
+  const displayTitle = user?.title ?? (lang === "ar" ? "مستخدم" : "User");
+  const displayAvatar = user?.avatar ?? "";
+  const userInitial = displayName.charAt(0) || "U";
+
+  // Show company items for company role, candidate items otherwise
+  const isCompany = user?.role === "company";
+  const isAdmin = user?.role === "admin";
+  const navItems = isCompany ? companyItems : candidateItems;
 
   const NavLink = ({ item }: { item: Item }) => {
     const active = pathname === item.to || (item.to !== "/app/dashboard" && pathname.startsWith(item.to));
@@ -86,43 +111,41 @@ export function AppShell({ children }: { children: ReactNode }) {
       <nav className="flex-1 space-y-6 overflow-y-auto">
         <div>
           <div className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            {t("dashboard")}
+            {isCompany ? t("companyHub") : t("dashboard")}
           </div>
           <div className="space-y-1">
-            {candidateItems.map((i) => <NavLink key={i.to} item={i} />)}
+            {navItems.map((i) => <NavLink key={i.to} item={i} />)}
           </div>
         </div>
-        <div>
-          <div className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            {t("companyHub")}
+        {isAdmin && (
+          <div>
+            <div className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              {t("admin")}
+            </div>
+            <div className="space-y-1">
+              {adminItems.map((i) => <NavLink key={i.to} item={i} />)}
+            </div>
           </div>
-          <div className="space-y-1">
-            {companyItems.map((i) => <NavLink key={i.to} item={i} />)}
-          </div>
-        </div>
-        <div>
-          <div className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            {t("admin")}
-          </div>
-          <div className="space-y-1">
-            {adminItems.map((i) => <NavLink key={i.to} item={i} />)}
-          </div>
-        </div>
+        )}
       </nav>
 
       <div className="rounded-xl border bg-gradient-soft p-3">
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9">
-            <AvatarImage src={candidate.avatar} />
-            <AvatarFallback>L</AvatarFallback>
+            <AvatarImage src={displayAvatar} />
+            <AvatarFallback>{userInitial}</AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <div className="truncate text-sm font-semibold">{candidate.name[lang]}</div>
-            <div className="truncate text-xs text-muted-foreground">{candidate.title[lang]}</div>
+            <div className="truncate text-sm font-semibold">{displayName}</div>
+            <div className="truncate text-xs text-muted-foreground">{displayTitle}</div>
           </div>
-          <Link to="/login" className="text-muted-foreground hover:text-foreground">
+          <button
+            onClick={handleLogout}
+            className="text-muted-foreground hover:text-foreground transition"
+            title={t("logout")}
+          >
             <LogOut className="h-4 w-4" />
-          </Link>
+          </button>
         </div>
       </div>
     </div>
@@ -185,8 +208,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               <span className="absolute end-1.5 top-1.5 h-2 w-2 rounded-full bg-primary-glow" />
             </Button>
             <Avatar className="h-8 w-8">
-              <AvatarImage src={candidate.avatar} />
-              <AvatarFallback>L</AvatarFallback>
+              <AvatarImage src={displayAvatar} />
+              <AvatarFallback>{userInitial}</AvatarFallback>
             </Avatar>
           </div>
         </header>
